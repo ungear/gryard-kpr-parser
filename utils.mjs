@@ -2,7 +2,7 @@ export function isTableWithRecipes(tableDom){
   return tableDom.innerText.toLowerCase().includes('item produced')
 }
 
-export function getRecipesFromTable(tableDom){
+export function getRecipesFromTable(tableDom, spriteCoords){
   const rows = tableDom
     .querySelectorAll('tr')
     .filter(tr => !tr.querySelector('th')); // remove table header
@@ -34,8 +34,22 @@ export function getRecipesFromTable(tableDom){
     }
     
     try {
-      const resultId = getResultIdFromCell(resultCell);
-      const ingredientIds = getIngredientIdsFromCell(ingredientsCell);
+      const result = getResultFromCell(resultCell);
+      const resultId = result.id;
+
+      // pushing sprite coords for result
+      if(!spriteCoords[resultId] && result.spriteCoords && result.spriteCoords !=='-0px -0px') 
+        spriteCoords[resultId] = result.spriteCoords;
+      
+      const ingredientsData = getIngredientIdsFromCell(ingredientsCell);
+      
+      // pushing sprite coords for ingredients
+      ingredientsData.forEach(ingData => {
+        if(!spriteCoords[ingData.id] && ingData.spriteCoords && ingData.spriteCoords !=='-0px -0px') 
+          spriteCoords[ingData.id] = ingData.spriteCoords;
+      })
+      
+      const ingredientIds = ingredientsData.map(x => x.id);
       if(resultId && ingredientIds && ingredientIds.length) {
         recipes.push({
           result: resultId,
@@ -55,9 +69,15 @@ export function getRecipesFromTable(tableDom){
 }
 
 
-function getResultIdFromCell(cellDom){
+function getResultFromCell(cellDom){
   const link = cellDom.querySelector('a'); // assuming that the first link points to desirable item
-  return getItemIdFromLink(link);
+  const id = getItemIdFromLink(link);
+  const iconEl = cellDom.querySelector('.item-sprite');
+ 
+  return {
+    id,
+    spriteCoords: getSpriteCoordsFromIcon(iconEl)
+  };
 }
 
 function getIngredientIdsFromCell(cellDom){
@@ -70,7 +90,14 @@ function getIngredientIdsFromCell(cellDom){
     if(!acc.includes(curr)) acc.push(curr);
     return acc;
   }, []);
-  return deduplicatedIds;
+
+  const iconEls = cellDom.querySelectorAll('.item-sprite');
+  const spriteCoords = iconEls.map(x => getSpriteCoordsFromIcon(x));
+  const output = deduplicatedIds.map((resId, resIndex) => ({
+    id: resId,
+    spriteCoords: spriteCoords[resIndex]
+  }))
+  return output;
 }
 
 // returns "black_paint" from <a href="/wiki/Black_paint">
@@ -79,5 +106,21 @@ function getItemIdFromLink(aTag){
   const urlSegments = url.split('/');
   const lastSegment = urlSegments[urlSegments.length - 1];
   return lastSegment.toLowerCase();
+}
+
+function getSpriteCoordsFromIcon(iconEl){
+  let spriteCoords;
+  try{
+    spriteCoords = iconEl.attributes.style
+      .split(';')
+      .filter(x => x.startsWith('background-position'))
+      .filter((x, index) => index === 0)
+      .reduce((acc, curr) => { return curr.replace(/background-position\:/, '')}, null)
+  } catch(err) {
+    console.log('Error when extracting sprite coords for '+ iconEl.innerHTML);
+    spriteCoords = null;
+  }
+
+  return spriteCoords;
 }
 
