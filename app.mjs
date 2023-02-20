@@ -16,20 +16,22 @@ async function main(){
   const recipeUrls = input.recipeUrls;
   let recipes = [];
   const spriteCoords = {};
+  const itemTitles = {};
   for await (const url of recipeUrls) {
     console.log('Processing ' + url);
     const rawHtml = await getHtml(url);
     const root = parse(rawHtml);
     const tables = root.querySelectorAll('table');
     const recipeTables = tables.filter(t => isTableWithRecipes(t));
-    const recipesOutput = getRecipesFromTable(recipeTables[0], spriteCoords);
+    const recipesOutput = getRecipesFromTable(recipeTables[0], spriteCoords, itemTitles);
     recipes = [...recipes, ...recipesOutput];
   }
 
   try {
     const output = {
       recipes,
-      spriteCoords
+      spriteCoords,
+      itemTitles
     }
     fs.writeFileSync('./result.json', JSON.stringify(output, null, 2));
     console.log('Results file created!')

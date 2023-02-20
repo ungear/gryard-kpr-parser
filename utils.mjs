@@ -2,7 +2,7 @@ export function isTableWithRecipes(tableDom){
   return tableDom.innerText.toLowerCase().includes('item produced')
 }
 
-export function getRecipesFromTable(tableDom, spriteCoords){
+export function getRecipesFromTable(tableDom, spriteCoords, itemTitles){
   const rows = tableDom
     .querySelectorAll('tr')
     .filter(tr => !tr.querySelector('th')); // remove table header
@@ -41,6 +41,10 @@ export function getRecipesFromTable(tableDom, spriteCoords){
       if(!spriteCoords[resultId] && result.spriteCoords && result.spriteCoords !=='-0px -0px') 
         spriteCoords[resultId] = result.spriteCoords;
       
+      // pushing item title
+      if(!itemTitles[resultId] && result.title) 
+        itemTitles[resultId] = result.title;
+
       const ingredientsData = getIngredientIdsFromCell(ingredientsCell);
       
       // pushing sprite coords for ingredients
@@ -73,9 +77,11 @@ function getResultFromCell(cellDom){
   const link = cellDom.querySelector('a'); // assuming that the first link points to desirable item
   const id = getItemIdFromLink(link);
   const iconEl = cellDom.querySelector('.item-sprite');
- 
+  const title = link.attributes.title;
+
   return {
     id,
+    title,
     spriteCoords: getSpriteCoordsFromIcon(iconEl)
   };
 }
