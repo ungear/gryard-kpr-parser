@@ -83,7 +83,12 @@ function getResultFromCell(cellDom){
 }
 
 function getIngredientIdsFromCell(cellDom){
-  const recipeItemSpans = cellDom.querySelectorAll(':scope > span');
+  const isCellHasP = cellDom.querySelectorAll(':scope > p').length > 0;
+  
+  const recipeItemSpans = isCellHasP 
+    ? [...cellDom.querySelectorAll(':scope > span'), ...cellDom.querySelectorAll(':scope > p > span')]
+    : cellDom.querySelectorAll(':scope > span');
+
   const ingredients = recipeItemSpans.map(x => getRecipeItemProperties(x));
   return ingredients;
 }
