@@ -41,16 +41,19 @@ export function getRecipesFromTable(tableDom, spriteCoords, itemTitles){
       if(!spriteCoords[resultId] && result.spriteCoords && result.spriteCoords !=='-0px -0px') 
         spriteCoords[resultId] = result.spriteCoords;
       
-      // pushing item title
+      // pushing item title for result
       if(!itemTitles[resultId] && result.title) 
         itemTitles[resultId] = result.title;
 
       const ingredientsData = getIngredientIdsFromCell(ingredientsCell);
       
-      // pushing sprite coords for ingredients
+      // pushing sprite coords amd titles for ingredients
       ingredientsData.forEach(ingData => {
         if(!spriteCoords[ingData.id] && ingData.spriteCoords && ingData.spriteCoords !=='-0px -0px') 
           spriteCoords[ingData.id] = ingData.spriteCoords;
+
+        if(!itemTitles[ingData.id] && ingData.title) 
+          itemTitles[ingData.id] = ingData.title;
       })
       
       const ingredientIds = ingredientsData.map(x => x.id);
@@ -74,9 +77,21 @@ export function getRecipesFromTable(tableDom, spriteCoords, itemTitles){
 
 
 function getResultFromCell(cellDom){
-  const link = cellDom.querySelector('a'); // assuming that the first link points to desirable item
+  const resultSpan = cellDom.querySelector(':scope > span');
+  const result = getRecipeItemProperties(resultSpan);
+  return result;
+}
+
+function getIngredientIdsFromCell(cellDom){
+  const recipeItemSpans = cellDom.querySelectorAll(':scope > span');
+  const ingredients = recipeItemSpans.map(x => getRecipeItemProperties(x));
+  return ingredients;
+}
+
+function getRecipeItemProperties(recipeItemSpan){
+  const link = recipeItemSpan.querySelector('a'); // assuming that the first link points to desirable item
   const id = getItemIdFromLink(link);
-  const iconEl = cellDom.querySelector('.item-sprite');
+  const iconEl = recipeItemSpan.querySelector('.item-sprite');
   const title = link.attributes.title;
 
   return {
@@ -84,26 +99,6 @@ function getResultFromCell(cellDom){
     title,
     spriteCoords: getSpriteCoordsFromIcon(iconEl)
   };
-}
-
-function getIngredientIdsFromCell(cellDom){
-  const links = cellDom.querySelectorAll('a');
-  const ids = links.map(x => getItemIdFromLink(x));
-
-  // the cell usually contain several links to the same item
-  // so we get rid of duplicates
-  const deduplicatedIds = ids.reduce((acc, curr) => {
-    if(!acc.includes(curr)) acc.push(curr);
-    return acc;
-  }, []);
-
-  const iconEls = cellDom.querySelectorAll('.item-sprite');
-  const spriteCoords = iconEls.map(x => getSpriteCoordsFromIcon(x));
-  const output = deduplicatedIds.map((resId, resIndex) => ({
-    id: resId,
-    spriteCoords: spriteCoords[resIndex]
-  }))
-  return output;
 }
 
 // returns "black_paint" from <a href="/wiki/Black_paint">
