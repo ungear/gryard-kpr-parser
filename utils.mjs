@@ -18,7 +18,7 @@ export function getRecipesFromTable(tableDom, spriteCoords, itemTitles){
     let resultCell;
     let ingredientsCell;
     
-    if(cells.length === 3){
+    if(cells.length === 3 || cells.length === 4){
       // regular row. Result is in the first cell, ingredients in the second one
       resultCell = cells[0];
       ingredientsCell = cells[1];
@@ -95,9 +95,13 @@ function getIngredientIdsFromCell(cellDom){
 
 function getRecipeItemProperties(recipeItemSpan){
   const link = recipeItemSpan.querySelector('a'); // assuming that the first link points to desirable item
-  const id = getItemIdFromLink(link);
+  const title = link 
+    ? link.attributes.title
+    : getItemTitleFromLinklessCell(recipeItemSpan);
+  const id = link 
+    ? getItemIdFromLink(link)
+    : title.toLowerCase().replace(' ', '_').replace('\'', '');
   const iconEl = recipeItemSpan.querySelector('.item-sprite');
-  const title = link.attributes.title;
 
   return {
     id,
@@ -112,6 +116,19 @@ function getItemIdFromLink(aTag){
   const urlSegments = url.split('/');
   const lastSegment = urlSegments[urlSegments.length - 1];
   return lastSegment.toLowerCase();
+}
+
+function getItemTitleFromLinklessCell(recipeItemSpan){
+  const spans = recipeItemSpan.querySelectorAll('span');
+  let id;
+  try {
+    id = spans[spans.length-1].innerText;
+  } catch(error){
+    console.error('Could not get id from linkless cell');
+    console.error(error);
+    id = 'not-found';
+  }
+  return id;
 }
 
 function getSpriteCoordsFromIcon(iconEl){
