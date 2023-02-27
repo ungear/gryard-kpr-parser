@@ -1,6 +1,7 @@
 import * as https  from 'https';
 import { parse } from 'node-html-parser';
 import { isTableWithRecipes, getRecipesFromTable } from './utils.mjs';
+import { relinkElectroPowder } from './final-polishing.mjs';
 import * as fs from 'fs';
 
 main();
@@ -27,12 +28,21 @@ async function main(){
     recipes = [...recipes, ...recipesOutput];
   }
 
+  let output = {
+    recipes,
+    spriteCoords,
+    itemTitles
+  }
+
   try {
-    const output = {
-      recipes,
-      spriteCoords,
-      itemTitles
-    }
+    output = relinkElectroPowder(output);
+  } catch(error){
+    console.error('Error when polishing output');
+    console.error(err);
+    process.exit(1);
+  }
+
+  try {
     fs.writeFileSync('./result.json', JSON.stringify(output, null, 2));
     console.log('Results file created!')
   } catch (err) {
