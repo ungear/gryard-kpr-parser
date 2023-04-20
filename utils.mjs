@@ -35,15 +35,24 @@ export function getRecipesFromTable(tableDom, spriteCoords, itemTitles){
     
     try {
       const result = getResultFromCell(resultCell);
-      const resultId = result.id;
+
+      // handle tree recipes for candle with the same name
+      // recipes will be added as candle, candle2 and candle3
+      if(result.id === 'candle'){
+        const existingCandlesNumber = recipes.filter(x => x.result.startsWith('candle')).length;
+        if(existingCandlesNumber !== 0 ) {
+          const addition = existingCandlesNumber + 1;
+          result.id = result.id + addition;
+        }
+      }
 
       // pushing sprite coords for result
-      if(!spriteCoords[resultId] && result.spriteCoords) 
-        spriteCoords[resultId] = result.spriteCoords;
+      if(!spriteCoords[result.id] && result.spriteCoords) 
+        spriteCoords[result.id] = result.spriteCoords;
       
       // pushing item title for result
-      if(!itemTitles[resultId] && result.title) 
-        itemTitles[resultId] = result.title;
+      if(!itemTitles[result.id] && result.title) 
+        itemTitles[result.id] = result.title;
 
       const ingredientsData = getIngredientIdsFromCell(ingredientsCell);
       
@@ -57,9 +66,9 @@ export function getRecipesFromTable(tableDom, spriteCoords, itemTitles){
       })
       
       const ingredientIds = ingredientsData.map(x => x.id);
-      if(resultId && ingredientIds && ingredientIds.length) {
+      if(result.id && ingredientIds && ingredientIds.length) {
         recipes.push({
-          result: resultId,
+          result: result.id,
           ingredients: ingredientIds,
         })
       } else {
