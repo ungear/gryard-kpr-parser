@@ -10,7 +10,7 @@ export function relinkElectroPowder(output){
   return output;
 }
 
-export function addPaintSpriteCoords(output){
+export function addCustomSpriteCoords(output){
   const hardcodedCoordsById = {
     brown_paint: '-38px -1186px',
     blue_paint: '-74px -1186px',
@@ -20,6 +20,12 @@ export function addPaintSpriteCoords(output){
     violet_paint: '-182px -1186px',
     red_paint: '-218px -1186px',
     yellow_paint: '-250px -1186px',
+    
+    universal_bag: '-978px -719px',
+    big_universal_bag: '-940px -719px',
+    potion_bag: '-978px -719px',    // copy of universal bag
+    builders_bag:  '-978px -719px', // copy of universal bag
+    food_bag: '-978px -719px',      // copy of universal bag
   }
   Object.entries(hardcodedCoordsById).forEach(([id, hardcocdedCoords]) => {
     if(output.spriteCoords[id] === '-0px -0px'){
