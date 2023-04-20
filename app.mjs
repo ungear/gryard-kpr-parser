@@ -1,7 +1,7 @@
 import * as https  from 'https';
 import { parse } from 'node-html-parser';
 import { isTableWithRecipes, getRecipesFromTable } from './utils.mjs';
-import { relinkElectroPowder } from './final-polishing.mjs';
+import { relinkElectroPowder, addPaintSpriteCoords } from './final-polishing.mjs';
 import * as fs from 'fs';
 
 main();
@@ -36,6 +36,7 @@ async function main(){
 
   try {
     output = relinkElectroPowder(output);
+    output = addPaintSpriteCoords(output);
   } catch(error){
     console.error('Error when polishing output');
     console.error(err);

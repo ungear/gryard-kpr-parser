@@ -38,7 +38,7 @@ export function getRecipesFromTable(tableDom, spriteCoords, itemTitles){
       const resultId = result.id;
 
       // pushing sprite coords for result
-      if(!spriteCoords[resultId] && result.spriteCoords && result.spriteCoords !=='-0px -0px') 
+      if(!spriteCoords[resultId] && result.spriteCoords) 
         spriteCoords[resultId] = result.spriteCoords;
       
       // pushing item title for result
