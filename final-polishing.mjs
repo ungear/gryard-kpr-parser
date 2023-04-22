@@ -23,9 +23,9 @@ export function addCustomSpriteCoords(output){
     
     universal_bag: '-978px -719px',
     big_universal_bag: '-940px -719px',
-    potion_bag: '-978px -719px',    // copy of universal bag
-    builders_bag:  '-978px -719px', // copy of universal bag
-    food_bag: '-978px -719px',      // copy of universal bag
+    potion_bag: '-1013px -719px',
+    builders_bag:  '-1048px -719px',
+    food_bag: '-1083px -719px',
   }
   Object.entries(hardcodedCoordsById).forEach(([id, hardcocdedCoords]) => {
     if(output.spriteCoords[id] === '-0px -0px'){
